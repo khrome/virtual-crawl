@@ -1,0 +1,28 @@
+{
+    "name": "virtual-crawl",
+    "version": "0.0.1",
+    "description": "A 3d client for DungeonCrawl:StoneSoup",
+    "main": "main.js",
+    "scripts": {
+        "start": "electron .",
+        "test": "mocha"
+    },
+    "keywords": [
+        "dungeon",
+        "crawl",
+        "stone",
+        "soup",
+        "roguelike"
+    ],
+    "author": "Abbey Hawk Sparrow",
+    "license": "MIT",
+    "devDependencies": {
+        "electron": "^27.1.2"
+    },
+    "dependencies": {
+        "cannon-es": "^0.20.0",
+        "extended-emitter": "^1.6.0",
+        "submesh-treadmill": "^0.0.3",
+        "three": "^0.158.0"
+    }
+}
