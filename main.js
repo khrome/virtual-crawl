@@ -1,4 +1,5 @@
 const { app, BrowserWindow } = require('electron');
+const { createServer } = require('./server/index.js');
 
 const createWindow = () => {
     const win = new BrowserWindow({
@@ -6,9 +7,10 @@ const createWindow = () => {
         height: 600
     })
 
-    win.loadFile('index.html')
+    win.loadURL('http://localhost:3000/index.html');
 }
 
-app.whenReady().then(() => {
-    createWindow()
+app.whenReady().then(async () => {
+    await createServer();
+    createWindow();
 })
