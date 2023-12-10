@@ -44,7 +44,7 @@ export class SimpleSubmesh extends Submesh{
     }
     
     async loadTile(x, y){
-        const result = await fetch(`http://localhost:3000/tiles/foo/${x}/${y}`);
+        const result = await fetch(`http://localhost:3000/tiles/oo/${x}/${y}`);
         this.tile = await result.text();
         console.log(this.tile);
         this.load.resolve();

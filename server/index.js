@@ -1,5 +1,7 @@
 const express = require('express');
-const LevelRoguelike = require('roguelike/level/roguelike');
+const { Roguelike, seed } = require('procedural-layouts');
+//const LevelRoguelike = require('roguelike/level/roguelike');
+
 
 const renderRogueLike = (world)=>{
     let result = '';
@@ -35,21 +37,22 @@ const layers = {};
 
 const getLayer = async = (name)=>{
     if(layers[name]) return layers[name];
-    let level = LevelRoguelike({
-      width: 64, // Max Width of the world
-      height: 64, // Max Height of the world
-      retry: 100, // How many times should we try to add a room?
-      special: true, // Should we generate a "special" room?
-      room: {
-        ideal: 35, // Give up once we get this number of rooms
-        min_width: 3,
-        max_width: 7,
-        min_height: 3,
-        max_height: 7
-      }
+    seed(name);
+    console.log('SEED', name)
+    let level = new Roguelike({
+        width: 64, // Max Width of the world
+        height: 64, // Max Height of the world
+        retry: 100, // How many times should we try to add a room?
+        special: true, // Should we generate a "special" room?
+        room: {
+            ideal: 35, // Give up once we get this number of rooms
+            min_width: 3,
+            max_width: 7,
+            min_height: 3,
+            max_height: 7
+        }
     });
-    //console.log(level);
-    const rendered = renderRogueLike(level.world);
+    const rendered = level.render();
     console.log(rendered);
     layers[name] = {
         level,
@@ -60,6 +63,42 @@ const getLayer = async = (name)=>{
     return layers[name];
 }
 
+const getTile = async(name, tileX, tileY)=>{
+    let result = [];
+    try{
+        const layer = typeof name === 'string'?await getLayer(name):name;
+        const x = tileX;
+        const y = tileY;
+        let row = '';
+        for(var lcvy=16*y; lcvy < 16*(y+1); lcvy++){
+            row = '';
+            for(var lcvx=16*x; lcvx < 16*(x+1); lcvx++){
+                row += layer.matrix[lcvy][lcvx] || ' ';
+            }
+            result.push(row);
+        }
+    }catch(ex){
+        console.log('ERROR', ex)
+    }
+    const returnValue = result.length?result.reverse().join('\n'):`                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                
+                `;
+    return returnValue;
+}
+
 const createServer = async ()=>{
     const app = express();
     const port = 3000;
@@ -67,39 +106,70 @@ const createServer = async ()=>{
     app.use(express.static('.'));
     
     app.get('/tiles/:layer/:x/:y', async (req, res) => {
-        let result = [];
+        const layer = req.params.layer;
+        const x = parseInt(req.params.x);
+        const y = parseInt(req.params.y);
+        let tile = null;
         try{
-            const layer = await getLayer(req.params.layer);
-            const x = parseInt(req.params.x);
-            const y = parseInt(req.params.y);
-            let row = '';
-            for(var lcvy=16*y; lcvy < 16*(y+1); lcvy++){
-                row = '';
-                for(var lcvx=16*x; lcvx < 16*(x+1); lcvx++){
-                    row += layer.matrix[lcvy][lcvx] || ' ';
-                }
-                result.push(row);
-            }
+            tile = await getTile(layer, x, y);
         }catch(ex){
             
         }
-        res.send(result.length?result.reverse().join('\n'):`                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                `);
+        res.send(tile);
         
+    });
+    
+    app.get('/meta/:layer/:position', async (req, res) => {
+        try{
+            const layer = (await getLayer(req.params.layer));
+            const data = layer.matrix;
+            //data = data.reverse();
+            var absolute = null;
+            var target = null;
+            const rows = data.length
+            const cols = data[0].length
+            for(var row=0; row < rows; row++){
+                for(var col=0; col <  data[row].length; col++){
+                    switch(req.params.position){
+                        case 'up':
+                            if(data[row][col] === '>'){
+                                console.log('FOUND UP')
+                                target = {
+                                    tile:{
+                                        x:Math.floor(row/16), 
+                                        y:Math.floor(col/16)
+                                    },
+                                    position:{
+                                        x:row,
+                                        y:col
+                                    }
+                                };
+                            }
+                            break;
+                        case 'down':
+                            if(data[row][col] === '<'){
+                                console.log('FOUND DOWN')
+                                target = {
+                                    tile:{
+                                        x:Math.floor(row/16), 
+                                        y:Math.floor(col/16)
+                                    },
+                                    position:{
+                                        x:row,
+                                        y:col
+                                    }
+                                }
+                            }
+                            break;
+                        default: throw new Error(`Unrecognized position: ${eq.params.position}`)
+                    }
+                }
+            }
+            const tile = await getTile(layer, target.tile.x, target.tile.y);
+            res.send( JSON.stringify({target, tile}) );
+        }catch(ex){
+            console.log('ERROR', ex);
+        }
     });
     
     app.get('/concat/:layer/:x/:y', async (req, res) => {
@@ -128,24 +198,6 @@ const createServer = async ()=>{
             console.log('ERROR', ex);
         }
     });
-    
-    /*app.get('/tiles/:layer/:x/:y', async (req, res) => {
-        const layer = await getLayer(req.params.layer);
-        console.log('L', layer)
-        const x = parseInt(req.params.x);
-        const y = parseInt(req.params.y);
-        let result = '';
-        let row = '';
-        for(var lcvy=16*y; lcvy < 16*(y+1); lcvy++){
-            row = '';
-            for(var lcvx=16*x; lcvx < 16*(x+1); lcvx++){
-                console.log(lcvy, lcvx, layer[lcvy][lcvx]);
-                row += layer[lcvy][lcvx];
-            }
-            result += row + '\n';
-        }
-        res.send(result);
-    });*/
     
     app.listen(port, () => {
         console.log(`Example app listening on port ${port}`)
