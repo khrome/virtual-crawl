@@ -1,6 +1,7 @@
 import { FBXObject } from '../FBXObject.js';
 
 let staticObject = null;
+
 export class Zombie extends FBXObject{
     
     constructor(options={}){

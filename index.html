@@ -72,7 +72,7 @@
             padding-top: calc(50vh - 177px)
         }
     </style>
-    <title>Hello World!</title>
+    <title>Aleister E. Crawl</title>
   </head>
   <body>
     <div class="game-world"></div>
@@ -103,7 +103,7 @@
         } from "three";
         import * as CANNON from 'cannon-es';
         import { DevelopmentTools } from './node_modules/submesh-treadmill/src/development.js';
-        import { Zombie } from './src/object.js';
+        import { Player } from './src/object.js';
         import { SimpleSubmesh } from './src/submesh.js';
         import { create as createLights } from './src/lights.js';
         import { create as createCamera } from './src/camera.js';
@@ -164,6 +164,7 @@
             const layer = 'oo'
             const result = await fetch(`http://localhost:3000/meta/${layer}/up`);
             const meta = await result.json();
+            console.log('LOADING', meta)
             treadmill = new Treadmill({
                 createSubmesh: async (x, y)=>{
                     const size = SimpleSubmesh.tileSize;
@@ -192,7 +193,7 @@
             }, scene, physicalWorld);
             
             let running = false;
-            const cameraMarker = new Marker(new Zombie({ color: 'red' }));
+            const cameraMarker = new Marker(new Player({ color: 'red' }));
             window.handleKey = (event)=>{ //handle iframes, yay!
                 // console.log(event)
                 switch(event.code){
@@ -209,8 +210,22 @@
             
             treadmill.loading.then(async ()=>{
                 // now let's set up an avatar for the camera's target, so we can move it around
-                const cameraX = meta.target.position.x - meta.target.tile.x * 16;
-                const cameraY = meta.target.position.y - meta.target.tile.y * 16;
+                let cameraX = meta.target.position.x - meta.target.tile.x * 16 + 0.5;
+                let cameraY = meta.target.position.y - meta.target.tile.y * 16 + 0.5;
+                switch(meta.target.facing){
+                    case 'north':
+                        cameraY += 1;
+                        break;
+                    case 'south':
+                        cameraY -= 1;
+                        break;
+                    case 'east':
+                        cameraX += 1;
+                        break;
+                    case 'west':
+                        cameraX -= 1;
+                        break;
+                }
                 treadmill.addMarkerToStage(cameraMarker, cameraX, cameraY);
                 controls.target = cameraMarker.mesh.position;
                 cameraMarker.linked.push(camera);
@@ -266,7 +281,7 @@
                             scene.remove(marker.mesh.selectedOutline);
                         }
                     },
-                    markerTypes: [Zombie]
+                    markerTypes: [Player]
                 });
                 
                 window.addEventListener('keydown', window.handleKey);

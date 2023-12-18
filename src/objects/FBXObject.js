@@ -31,6 +31,7 @@ import {
 } from "three";
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
+/*
 export class FBXObject extends Projectile{
     
     constructor(options={}){
@@ -38,6 +39,104 @@ export class FBXObject extends Projectile{
         this.size = this.options.size || 0.25;
         this.color = options.color || Math.random() * 0xffffff ;
         this.model = '';
+    }
+    
+    static async preloadObject(model){
+        const fbxLoader = new FBXLoader()
+        return await new Promise((resolve, reject)=>{
+            fbxLoader.load(
+                model,
+                (object) => {
+                    object.traverse((child)=>{
+                        if(child.isMesh){
+                            child.rotation.x += 1.5;
+                            child.scale.set(.01, .01, .01)
+                            //child.matrix.makeRotationX(1.5)
+                        }
+                    })
+                    //object.scale.set(.01, .01, .01)
+                    //object.makeRotationX(1.5)
+                    //object.rotation.x += 1.5;
+                    resolve(object);
+                },
+                (xhr) => {
+                    //console.log((xhr.loaded / xhr.total) * 100 + '% loaded')
+                },
+                (error) => {
+                    reject(error)
+                }
+            );
+        });
+    }
+    
+    buildObject(){
+        if(!this.object) throw new Error('Object not loaded!');
+        return this.object;
+        //const geometry = new BoxGeometry(this.size,this.size,this.size);
+    }
+}*/
+
+
+export class FBXObject extends MeshObject{
+    
+    constructor(options={}){
+        super(options);
+        this.size = this.options.size || 0.25;
+        this.color = options.color || Math.random() * 0xffffff ;
+        this.model = '';
+    }
+    
+    defineActions(){
+        return {
+            priority: ['moveTo', 'interact', 'toss'],
+            moveTo: (delta, marker, target, options={}, treadmill) => { //meta
+                //todo: test "crow flies" obstruction, if obstructed: path find
+                marker.action('turn', treadmill.worldPointFor(target), options, treadmill);
+                marker.action('forward', treadmill.worldPointFor(target), options, treadmill);
+                return delta; 
+            },
+            turn: (delta, marker, target, options={}, treadmill) => {
+                return marker.turnRight(delta, target, options, treadmill);
+            },
+            turnLeft: (delta, marker, target, options={}, treadmill) => {
+                return marker.turnLeft(delta, target, options, treadmill);
+            },
+            turnRight: (delta, marker, target, options={}, treadmill) => {
+                return marker.turnRight(delta, target, options, treadmill);
+            },
+            strafeLeft: (delta, marker, target, options={}, treadmill) => {
+                return marker.strafeLeft(delta, target, options, treadmill);
+            },
+            strafeRight: (delta, marker, target, options={}, treadmill) => {
+                return marker.strafeRight(delta, target, options, treadmill);
+            },
+            forward: (delta, marker, target, options={}, treadmill) => {
+                return marker.forward(delta, target, options, treadmill);
+            },
+            backward: (delta, marker, target, options={}, treadmill) => {
+                return marker.backward(delta, target, options, treadmill);
+            },
+            interact: (delta, marker, target, options={}, treadmill) => {
+                // create projectile
+                const ball = new Ball();
+                const worldPoint = treadmill.worldPointFor(target);
+                const newMarker = marker.spawn(ball, target);
+                const submesh = treadmill.submeshAt(marker.mesh.position.x, marker.mesh.position.y);
+                submesh.markers.push(newMarker);
+                treadmill.scene.add(newMarker.mesh);
+                newMarker.action('moveTo', worldPoint, {}, treadmill);
+            },
+            toss: (delta, marker, target, options={}, treadmill) => {
+                // create projectile
+                const ball = new BouncyBall();
+                const worldPoint = treadmill.worldPointFor(target);
+                const newMarker = marker.spawn(ball, target);
+                //newMarker.body.position.copy(marker.mesh.position);
+                const submesh = treadmill.submeshAt(marker.mesh.position.x, marker.mesh.position.y);
+                submesh.markers.push(newMarker);
+                newMarker.addTo(treadmill.scene, null, target, { velocity: 15 });
+            }
+        };
     }
     
     static async preloadObject(model){

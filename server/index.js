@@ -1,6 +1,5 @@
 const express = require('express');
 const { Roguelike, seed } = require('procedural-layouts');
-//const LevelRoguelike = require('roguelike/level/roguelike');
 
 
 const renderRogueLike = (world)=>{
@@ -112,11 +111,8 @@ const createServer = async ()=>{
         let tile = null;
         try{
             tile = await getTile(layer, x, y);
-        }catch(ex){
-            
-        }
+        }catch(ex){ }
         res.send(tile);
-        
     });
     
     app.get('/meta/:layer/:position', async (req, res) => {
@@ -126,39 +122,49 @@ const createServer = async ()=>{
             //data = data.reverse();
             var absolute = null;
             var target = null;
+            var up = null;
+            var down = null;
             const rows = data.length
             const cols = data[0].length
             for(var row=0; row < rows; row++){
                 for(var col=0; col <  data[row].length; col++){
+                    if(data[row][col] === '>'){
+                        console.log('FOUND UP')
+                        up = {
+                            tile:{
+                                x: Math.floor(col/16), 
+                                y: Math.floor(row/16)
+                            },
+                            position:{
+                                x:col,
+                                y:row
+                            },
+                            facing: 'south'
+                        };
+                    }
+                    if(data[row][col] === '<'){
+                        console.log('FOUND DOWN')
+                        down = {
+                            tile:{
+                                x: Math.floor(col/16), 
+                                y: Math.floor(row/16)
+                            },
+                            position:{
+                                x: col,
+                                y: row
+                            },
+                            facing: 'south'
+                        }
+                    }
                     switch(req.params.position){
                         case 'up':
                             if(data[row][col] === '>'){
-                                console.log('FOUND UP')
-                                target = {
-                                    tile:{
-                                        x:Math.floor(row/16), 
-                                        y:Math.floor(col/16)
-                                    },
-                                    position:{
-                                        x:row,
-                                        y:col
-                                    }
-                                };
+                                target = up;
                             }
                             break;
                         case 'down':
                             if(data[row][col] === '<'){
-                                console.log('FOUND DOWN')
-                                target = {
-                                    tile:{
-                                        x:Math.floor(row/16), 
-                                        y:Math.floor(col/16)
-                                    },
-                                    position:{
-                                        x:row,
-                                        y:col
-                                    }
-                                }
+                                target = down;
                             }
                             break;
                         default: throw new Error(`Unrecognized position: ${eq.params.position}`)
@@ -166,7 +172,7 @@ const createServer = async ()=>{
                 }
             }
             const tile = await getTile(layer, target.tile.x, target.tile.y);
-            res.send( JSON.stringify({target, tile}) );
+            res.send( JSON.stringify({up, down, target, tile}) );
         }catch(ex){
             console.log('ERROR', ex);
         }
@@ -181,10 +187,18 @@ const createServer = async ()=>{
         const y = parseInt(req.params.y);
         try{
             console.log(`http://localhost:3000/concat/${req.params.layer}/${x}/${y}`)
-            const a = await (await fetch(`http://localhost:3000/tiles/${req.params.layer}/${x}/${y}`)).text();
-            const b = await (await fetch(`http://localhost:3000/tiles/${req.params.layer}/${x+1}/${y}`)).text();
-            const c = await (await fetch(`http://localhost:3000/tiles/${req.params.layer}/${x}/${y+1}`)).text();
-            const d = await (await fetch(`http://localhost:3000/tiles/${req.params.layer}/${x+1}/${y+1}`)).text();
+            const a = await (await fetch(
+                `http://localhost:3000/tiles/${req.params.layer}/${x}/${y}`
+            )).text();
+            const b = await (await fetch(
+                `http://localhost:3000/tiles/${req.params.layer}/${x+1}/${y}`
+            )).text();
+            const c = await (await fetch(
+                `http://localhost:3000/tiles/${req.params.layer}/${x}/${y+1}`
+            )).text();
+            const d = await (await fetch(
+                `http://localhost:3000/tiles/${req.params.layer}/${x+1}/${y+1}`
+            )).text();
             const bParts = b.split('\n');
             const combinedAB = a.split('\n').map((item, index)=>{
                 return item + bParts[index];
