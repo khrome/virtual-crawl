@@ -23,7 +23,7 @@ import {
     PerspectiveCamera
 } from "three";
 import * as CANNON from 'cannon-es';
-import { StoneBlock, Floor, Wall } from './object.js';
+import { StoneBlock, Floor, Wall, Door, Stairs } from './object.js';
 
 // each submesh has squares on it representing it's coordinates
 export class SimpleSubmesh extends Submesh{
@@ -46,7 +46,7 @@ export class SimpleSubmesh extends Submesh{
     async loadTile(x, y){
         const result = await fetch(`http://localhost:3000/tiles/oo/${x}/${y}`);
         this.tile = await result.text();
-        console.log(this.tile);
+        console.log(this.tile, x, y);
         this.load.resolve();
     }
     
@@ -77,22 +77,36 @@ export class SimpleSubmesh extends Submesh{
             color: color,
             size: 0.5
         };
-        const textMatrix = this.tile.split('\n').map((row)=> row.split('')).reverse()
-        console.log('TILE', this.tile, textMatrix);
+        const textMatrix = this.tile.split('\n').map((row)=> row.split('')).reverse();
         const markerOptions = {
             shadow: 'light'
-        }
+        };
         try{
             for(var y=0; y < 16; y++){
                 for(var x=0; x < 16; x++){
                     let thisObject = null;
-                    console.log('*', x, y);
+                    //console.log('*', x, y);
                     switch(textMatrix[y][x]){
                         case '#':
                             thisObject = new Wall(options);
                             break;
                         case '.':
                             thisObject = new Floor(options);
+                            break;
+                        case '/':
+                            if(
+                                (textMatrix[y-1] && textMatrix[y-1][x] === '#') ||
+                                (textMatrix[y+1] && textMatrix[y+1][x] === '#')
+                            ){
+                                options.orientation = 'horizontal';
+                            }
+                            thisObject = new Door(options);
+                            break;
+                        case '>':
+                            thisObject = new Stairs(options);
+                            break;
+                        case '<':
+                            thisObject = new Stairs(options);
                             break;
                         default: thisObject = new StoneBlock(options);
                     }

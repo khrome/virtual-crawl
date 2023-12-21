@@ -31,8 +31,8 @@ import {
 } from "three";
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
 
-/*
-export class FBXObject extends Projectile{
+
+export class FBXProjectile extends Projectile{
     
     constructor(options={}){
         super(options);
@@ -74,7 +74,7 @@ export class FBXObject extends Projectile{
         return this.object;
         //const geometry = new BoxGeometry(this.size,this.size,this.size);
     }
-}*/
+}
 
 
 export class FBXObject extends MeshObject{
@@ -89,32 +89,11 @@ export class FBXObject extends MeshObject{
     defineActions(){
         return {
             priority: ['moveTo', 'interact', 'toss'],
-            moveTo: (delta, marker, target, options={}, treadmill) => { //meta
-                //todo: test "crow flies" obstruction, if obstructed: path find
-                marker.action('turn', treadmill.worldPointFor(target), options, treadmill);
-                marker.action('forward', treadmill.worldPointFor(target), options, treadmill);
-                return delta; 
+            damage: (delta, marker, target, options={}, treadmill) => {
+                //return marker.turnRight(delta, target, options, treadmill);
             },
-            turn: (delta, marker, target, options={}, treadmill) => {
-                return marker.turnRight(delta, target, options, treadmill);
-            },
-            turnLeft: (delta, marker, target, options={}, treadmill) => {
+            destroy: (delta, marker, target, options={}, treadmill) => {
                 return marker.turnLeft(delta, target, options, treadmill);
-            },
-            turnRight: (delta, marker, target, options={}, treadmill) => {
-                return marker.turnRight(delta, target, options, treadmill);
-            },
-            strafeLeft: (delta, marker, target, options={}, treadmill) => {
-                return marker.strafeLeft(delta, target, options, treadmill);
-            },
-            strafeRight: (delta, marker, target, options={}, treadmill) => {
-                return marker.strafeRight(delta, target, options, treadmill);
-            },
-            forward: (delta, marker, target, options={}, treadmill) => {
-                return marker.forward(delta, target, options, treadmill);
-            },
-            backward: (delta, marker, target, options={}, treadmill) => {
-                return marker.backward(delta, target, options, treadmill);
             },
             interact: (delta, marker, target, options={}, treadmill) => {
                 // create projectile

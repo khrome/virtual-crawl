@@ -127,9 +127,9 @@
             const scene = new Scene();
             
             const horizonPlaneGeometry = new PlaneGeometry( 1024, 1024 );
-            horizonPlaneGeometry.translate( 8, 8, -0.001 );
+            horizonPlaneGeometry.translate( 8, 8, -1 );
             const horizonMaterial = new MeshPhongMaterial({
-                color: "#00FF00", 
+                color: "#444444", 
                 flatShading: false
             });
             const horizonPlane = new Mesh( horizonPlaneGeometry, horizonMaterial );

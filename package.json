@@ -20,12 +20,15 @@
         "electron": "^27.1.2"
     },
     "dependencies": {
+        "bitwise-logger": "^0.0.4",
         "cannon-es": "^0.20.0",
         "express": "^4.18.2",
         "extended-emitter": "^1.6.0",
         "procedural-layouts": "^0.0.2",
         "roguelike": "^0.5.0",
+        "stats.js": "^0.17.0",
         "submesh-treadmill": "^0.0.4",
-        "three": "^0.158.0"
+        "three": "^0.158.0",
+        "three-spritetext": "^1.8.1"
     }
 }

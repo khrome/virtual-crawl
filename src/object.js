@@ -40,6 +40,8 @@ import {
 import { Zombie } from './objects/monster/zombie.js';
 import { StoneBlock } from './objects/scenery/stone_block.js';
 import { Floor } from './objects/scenery/floor.js';
+import { Stairs } from './objects/scenery/stairs.js';
+import { Door } from './objects/scenery/door.js';
 import { Wall } from './objects/scenery/wall.js';
 import { Player } from './objects/monster/player.js';
 import { Orb } from './objects/projectiles/orb.js';
@@ -49,13 +51,13 @@ export {
     //MONS
     Zombie, Player,
     //SCEN
-    StoneBlock, Floor, Wall,
+    StoneBlock, Floor, Wall, Door, Stairs,
     // PROJ
     Orb
 };
 
 export const monsters = [ Zombie, Player ];
-export const scenery = [ StoneBlock, Floor, Wall ];
+export const scenery = [ StoneBlock, Floor, Wall, Door, Stairs ];
 export const projectiles = [ Orb ];
 
 const allObjects = monsters.concat(scenery);
