@@ -1,0 +1,60 @@
+body{
+    padding: 0px;
+    margin: 0px;
+    width:100%; 
+    height: 100%
+}
+#mocha, #mocha-stats{
+    background-color: rgba(0, 0, 0, 0.5);
+}
+.game-world{
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    display: block;
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right:0px;
+    z-index: -1;
+}
+table.keys td{
+    height: 40px
+}
+table.keys td:nth-child(2){
+    vertical-align: bottom;
+    text-align: left;
+    color: white;
+}
+div.screen{
+    background: rgba(40, 40, 40, 0.5);
+    top: 0px;
+    bottom: 0px;
+    left: 0px;
+    right: 0px;
+    position: static;
+    display: block;
+    width:100%; 
+    height: 100%;
+    text-align: center;
+
+}
+div.screen table{
+    margin: auto;
+    padding-top: calc(50vh - 177px)
+}
+#minimap{
+  display: block;
+  position:absolute;
+  width: 200px;
+  height: 200px;
+  top: 0px;
+  right: 0px;
+  z-index: 100;
+  border-bottom-left-radius: 200px
+}
+#mapcontainer{
+    height: 100%;
+    overflow: hidden;
+    border-bottom-left-radius: 200px
+}

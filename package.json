@@ -1,34 +1,51 @@
 {
     "name": "virtual-crawl",
     "version": "0.0.1",
-    "description": "A 3d client for DungeonCrawl:StoneSoup",
+    "description": "A Roguelike demo",
     "main": "main.js",
     "scripts": {
         "start": "electron .",
+        "rebuild": "electron-rebuild -f -w canvas",
+        "serve-map": "node ./server/standalone.js",
+        "local-map": "open \"http://localhost:8085/server/map-demo.html\" ; npx http-server -p 8085",
         "test": "mocha"
     },
     "keywords": [
         "dungeon",
         "crawl",
-        "stone",
-        "soup",
-        "roguelike"
+        "roguelike",
+        "roguelite",
+        "game",
+        "3d"
     ],
     "author": "Abbey Hawk Sparrow",
     "license": "MIT",
     "devDependencies": {
+        "@electron/rebuild": "^3.4.1",
         "electron": "^27.1.2"
     },
     "dependencies": {
+        "@environment-safe/canvas": "^4.2.0",
+        "@environment-safe/elements": "^0.0.3",
+        "@environment-safe/file": "^0.3.1",
+        "@environment-safe/runtime-context": "^0.0.1",
+        "@environment-safe/tween": "^0.0.1",
+        "@mapbox/tilebelt": "^1.0.2",
+        "@napi-rs/canvas": "^0.1.44",
         "bitwise-logger": "^0.0.4",
         "cannon-es": "^0.20.0",
+        "canvas": "^2.11.2",
+        "cors": "^2.8.5",
         "express": "^4.18.2",
         "extended-emitter": "^1.6.0",
         "procedural-layouts": "^0.0.2",
         "roguelike": "^0.5.0",
+        "skeleton-keyhole": "^1.1.1",
         "stats.js": "^0.17.0",
-        "submesh-treadmill": "^0.0.4",
+        "submesh-treadmill": "^0.0.5",
         "three": "^0.158.0",
-        "three-spritetext": "^1.8.1"
+        "three-spritetext": "^1.8.1",
+        "tilestrata": "^2.3.2",
+        "tilestrata-disk": "^0.5.0"
     }
 }

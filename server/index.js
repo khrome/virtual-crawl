@@ -1,108 +1,18 @@
 const express = require('express');
-const { Roguelike, seed } = require('procedural-layouts');
-
-
-const renderRogueLike = (world)=>{
-    let result = '';
-    var row = '';
-    for (var y = 0; y < world.length; y++) {
-      row = '';
-      for (var x = 0; x < world[y].length; x++) {
-        var tile = world[y][x];
-        if (tile === 0) {
-          row += ' ';
-        } else if (tile === 1) {
-          row += '.';
-        } else if (tile === 2) {
-          row += '#';
-        } else if (tile === 3) {
-          row += '/';
-        } else if (tile === 4) {
-          row += 'X';
-        } else if (tile === 5) {
-          row += '<';
-        } else if (tile === 6) {
-          row += '>';
-        } else {
-          row += world[y][x];
-        }
-      }
-      result += row + '\n';
-    }
-    return result;
-}
-
-const layers = {};
-
-const getLayer = async = (name)=>{
-    if(layers[name]) return layers[name];
-    seed(name);
-    console.log('SEED', name)
-    let level = new Roguelike({
-        width: 64, // Max Width of the world
-        height: 64, // Max Height of the world
-        retry: 100, // How many times should we try to add a room?
-        special: true, // Should we generate a "special" room?
-        room: {
-            ideal: 35, // Give up once we get this number of rooms
-            min_width: 3,
-            max_width: 7,
-            min_height: 3,
-            max_height: 7
-        }
-    });
-    const rendered = level.render();
-    console.log(rendered);
-    layers[name] = {
-        level,
-        rendered,
-        matrix: rendered.split('\n').map((line)=>line.split('')).reverse()
-    }
-    //2d array row/col from origin in quadrant I
-    return layers[name];
-}
-
-const getTile = async(name, tileX, tileY)=>{
-    let result = [];
-    try{
-        const layer = typeof name === 'string'?await getLayer(name):name;
-        const x = tileX;
-        const y = tileY;
-        let row = '';
-        for(var lcvy=16*y; lcvy < 16*(y+1); lcvy++){
-            row = '';
-            for(var lcvx=16*x; lcvx < 16*(x+1); lcvx++){
-                row += layer.matrix[lcvy][lcvx] || ' ';
-            }
-            result.push(row);
-        }
-    }catch(ex){
-        console.log('ERROR', ex)
-    }
-    const returnValue = result.length?result.reverse().join('\n'):`                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                
-                `;
-    return returnValue;
-}
+//const { Roguelike, seed } = require('procedural-layouts');
+const tilestrata = require('tilestrata');
+const disk = require('tilestrata-disk');
+const roguelikeTile = require('./generate-tile.js');
+const { renderRogueLike, getLayer, getTile } = require('./generate-ascii-tile.js');
+const cors = require('cors');
 
 const createServer = async ()=>{
     const app = express();
     const port = 3000;
     
     app.use(express.static('.'));
+    app.use(cors());
+    
     
     app.get('/tiles/:layer/:x/:y', async (req, res) => {
         const layer = req.params.layer;
@@ -212,6 +122,20 @@ const createServer = async ()=>{
             console.log('ERROR', ex);
         }
     });
+    
+    const strata = tilestrata();
+    strata.layer('basemap').route('tile.png')
+        .use(roguelikeTile())
+        /*.use(disk.cache({
+            maxage: 3600, 
+            dir: './tiles/basemap'
+        }));*/
+    
+    app
+        .use(tilestrata.middleware({
+            server: strata,
+            prefix: '/minimap'
+        }));
     
     app.listen(port, () => {
         console.log(`Example app listening on port ${port}`)

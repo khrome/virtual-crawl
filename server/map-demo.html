@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <script type="importmap">{ "imports" :{
+            "browser-or-node":"https://unpkg.com/browser-or-node@2.1.1/src/index.js", 
+            "@environment-safe/package" : "https://unpkg.com/@environment-safe/package@0.1.3/src/index.mjs",
+            "@environment-safe/elements" : "https://unpkg.com/@environment-safe/elements/src/index.mjs",
+            "sift": "/node_modules/sift/es5m/index.js",
+            "@environment-safe/canvas" : "https://unpkg.com/@environment-safe/canvas/src/index.mjs",
+            "@environment-safe/tween" : "https://unpkg.com/@environment-safe/tween/src/index.mjs",
+            "@environment-safe/file" : "https://unpkg.com/@environment-safe/file/src/index.mjs",
+            "skeleton-keyhole":"../node_modules/skeleton-keyhole/src/index.mjs",
+            "skeleton-keyhole/miniplot":"../node_modules/skeleton-keyhole/src/miniplot.mjs",
+            "@environment-safe/runtime-context" : "https://unpkg.com/@environment-safe/runtime-context/src/index.mjs",
+            "module": "https://unpkg.com/browser-or-node@2.1.1/src/index.js",
+            "node:events": "https://unpkg.com/extended-emitter@1.3.2/node-events.mjs",
+            "@turf/bbox":"https://cdn.jsdelivr.net/npm/@turf/bbox@6.5.0/dist/es/index.js",
+            "@turf/bbox-polygon":"https://cdn.jsdelivr.net/npm/@turf/bbox-polygon@6.5.0/dist/es/index.js",
+            "@turf/polygon":"https://cdn.jsdelivr.net/npm/@turf/polygon@6.5.0/dist/es/index.js",
+            "@turf/multi-polygon":"https://cdn.jsdelivr.net/npm/@turf/multi-polygon@6.5.0/dist/es/index.js",
+            "@turf/difference":"https://cdn.jsdelivr.net/npm/@turf/difference@6.5.0/dist/es/index.js",
+            "@turf/combine":"https://cdn.jsdelivr.net/npm/@turf/combine@6.5.0/dist/es/index.js",
+            "@turf/helpers":"https://cdn.jsdelivr.net/npm/@turf/helpers@6.5.0/dist/es/index.js",
+            "@turf/meta":"https://cdn.jsdelivr.net/npm/@turf/meta@6.5.0/dist/es/index.js",
+            "extended-emitter": "/node_modules/extended-emitter/extended-emitter.mjs",
+            "node:events": "/node_modules/extended-emitter/node-events.mjs",
+            "os": "https://unpkg.com/browser-or-node@2.1.1/src/index.js",
+            "fs": "https://unpkg.com/browser-or-node@2.1.1/src/index.js",
+            "path": "https://unpkg.com/browser-or-node@2.1.1/src/index.js"
+        }}</script>
+        <title>SkeletonKeyhole :: Leaflet Demo</title>
+        <style>
+            body, skeleton-keyhole{
+                margin:0px;
+                display:block;
+                height: 100%;
+                width: 100%;
+            }
+        </style>
+        <script>
+            window.alertDump = function(feature){
+                alert(JSON.stringify(feature))
+            }
+        </script>
+        <script type="module">
+            import 'skeleton-keyhole/miniplot';
+            import { 
+                SkeletonKeyhole 
+            } from 'skeleton-keyhole';
+        </script>
+        <style>
+            .map-container{
+                height: 100%;
+                width: 100%;
+                position:absolute;
+                display: block;
+            }
+        </style>
+    </head>
+    <body>
+        <div class="map-container">
+            <skeleton-keyhole
+                engine="miniplot"
+                placeHolder="../node_modules/skeleton-keyhole/test/static/assets/tile-placeholder.png"
+                identifier="plot"
+                id="plot"
+                token="no-token"
+                zoom="19"
+                center="[26, 25]"
+            >
+                <keyhole-tiles
+                    url="http://localhost:3000/minimap/basemap/{z}/{x}/{y}/tile.png?level=oo"
+                ></keyhole-tiles>
+            </skeleton-keyhole>
+        </div>
+        <script type="module">
+            setTimeout(async ()=>{
+                const plot = document.getElementById('plot')
+                /*
+                console.log('0');
+                await plot.animateTo([
+                    40,
+                    40
+                ], 2000);
+                console.log('1');
+                await plot.animateTo([
+                    40,
+                    10
+                ], 2000);
+                console.log('2');
+                await plot.animateTo([
+                    10,
+                    10
+                ], 2000);
+                console.log('3');
+                await plot.animateTo([
+                    10,
+                    40
+                ], 2000);
+                console.log('4');
+                await plot.animateTo([
+                    40,
+                    40
+                ], 2000); //*/
+            }, 2000);
+        </script>
+    </body>
+</html>
