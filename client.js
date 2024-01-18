@@ -222,6 +222,16 @@ const container = document.querySelector(".game-world");
                     scene.remove(marker.mesh.selectedOutline);
                 }
             },
+            isSelectable:(object, point, worldPoint, localPoint)=>{
+                if(object.x !== null && object.y !== null){
+                    const x = Math.floor(worldPoint.x%16);
+                    const y = Math.floor(worldPoint.y%16);
+                    if(object.passability && object.passability[y]){
+                        return object.passability[y][x];
+                    }
+                }
+                return true;
+            },
             markerTypes: [Player]
         });
         

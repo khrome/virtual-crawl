@@ -42,7 +42,7 @@
         "roguelike": "^0.5.0",
         "skeleton-keyhole": "^1.1.1",
         "stats.js": "^0.17.0",
-        "submesh-treadmill": "^0.0.5",
+        "submesh-treadmill": "^0.0.6",
         "three": "^0.158.0",
         "three-spritetext": "^1.8.1",
         "tilestrata": "^2.3.2",

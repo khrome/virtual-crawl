@@ -46,7 +46,7 @@ export class SimpleSubmesh extends Submesh{
     async loadTile(x, y){
         const result = await fetch(`http://localhost:3000/tiles/oo/${x}/${y}`);
         this.tile = await result.text();
-        console.log(this.tile, x, y);
+        //console.log(this.tile, x, y);
         this.load.resolve();
     }
     
@@ -81,17 +81,22 @@ export class SimpleSubmesh extends Submesh{
         const markerOptions = {
             shadow: 'light'
         };
+        const passabilityMatrix = [];
+        let passabilityRow = null;
         try{
             for(var y=0; y < 16; y++){
+                passabilityRow = [];
                 for(var x=0; x < 16; x++){
                     let thisObject = null;
                     //console.log('*', x, y);
                     switch(textMatrix[y][x]){
                         case '#':
                             thisObject = new Wall(options);
+                            passabilityRow.push(false);
                             break;
                         case '.':
                             thisObject = new Floor(options);
+                            passabilityRow.push(true);
                             break;
                         case '/':
                             if(
@@ -101,21 +106,29 @@ export class SimpleSubmesh extends Submesh{
                                 options.orientation = 'horizontal';
                             }
                             thisObject = new Door(options);
+                            passabilityRow.push(true);
                             break;
                         case '>':
                             thisObject = new Stairs(options);
+                            passabilityRow.push(false);
                             break;
                         case '<':
                             thisObject = new Stairs(options);
+                            passabilityRow.push(false);
                             break;
-                        default: thisObject = new StoneBlock(options);
+                        default: 
+                            thisObject = new StoneBlock(options);
+                            passabilityRow.push(false);
                     }
                     marker = new Marker(thisObject, markerOptions);
                     marker.naturalX = x + this.mesh.position.x + 0.5;
                     marker.naturalY = y + this.mesh.position.y + 0.5;
                     markers.push(marker);
                 }
+                passabilityMatrix.push(passabilityRow);
             }
+            //we went top to bottom, so flip it to reorient
+            this.passability = passabilityMatrix; //.reverse();
         }catch(ex){
             console.log('====', ex, this.tile);
         }
