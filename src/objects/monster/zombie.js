@@ -1,8 +1,8 @@
-import { FBXObject } from '../FBXObject.js';
+import { FBXObject, GameFBXObject } from '../FBXObject.js';
 
 let staticObject = null;
 
-export class Zombie extends FBXObject{
+export class Zombie extends GameFBXObject{
     
     constructor(options={}){
         super(options);

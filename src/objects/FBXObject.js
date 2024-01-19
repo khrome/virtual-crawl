@@ -81,9 +81,12 @@ export class FBXObject extends MeshObject{
     
     constructor(options={}){
         super(options);
+        //console.log('A')
         this.size = this.options.size || 0.25;
         this.color = options.color || Math.random() * 0xffffff ;
         this.model = '';
+        this.persona = FBXObject.persona;
+        //console.log('B', FBXObject.persona, this.persona)
     }
     
     defineActions(){
@@ -178,5 +181,61 @@ export class FBXObject extends MeshObject{
             object.add(window.tools.axes(offset));
         }
         return object;*/
+    }
+}
+
+export class GameObject extends MeshObject{
+
+    constructor(options={}){
+        super(options);
+    }
+    
+    static personality(sutra, actions){
+        // hack: 
+        sutra.on('fightOrFlight', (entity) => {
+            console.log('FOF')
+        });
+        //end hack
+        sutra.addCondition('isThreatened', (context) =>{
+            console.log('isThreat')
+            const monsters = context.nearbyMarkers('monster');
+            //const avgPower = monsters.reduce(()=> );
+            return true;
+        });
+        //sutra.addCondition('isWindy', (context) => context.isWindy);
+        //sutra.addCondition('isRaining', (context) => context.isRaining);
+        
+        sutra.
+            if('isThreatened').
+                then('fightOrFlight')
+        return sutra;
+    }
+}
+
+export class GameFBXObject extends FBXObject{
+
+    constructor(options={}){
+        super(options);
+    }
+    
+    static personality(sutra, actions){
+        // hack: 
+        sutra.on('fightOrFlight', (entity) => {
+            console.log('FOF')
+        });
+        //end hack
+        sutra.addCondition('isThreatened', (context) =>{
+            console.log('isThreat')
+            const monsters = context.nearbyMarkers('monster');
+            //const avgPower = monsters.reduce(()=> );
+            return false;
+        });
+        //sutra.addCondition('isWindy', (context) => context.isWindy);
+        //sutra.addCondition('isRaining', (context) => context.isRaining);
+        
+        sutra.
+            if('isThreatened').
+                then('fightOrFlight')
+        return sutra;
     }
 }

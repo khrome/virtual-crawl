@@ -32,6 +32,7 @@
         "@environment-safe/tween": "^0.0.1",
         "@mapbox/tilebelt": "^1.0.2",
         "@napi-rs/canvas": "^0.1.44",
+        "@yantra-core/sutra": "^1.8.0",
         "bitwise-logger": "^0.0.4",
         "cannon-es": "^0.20.0",
         "canvas": "^2.11.2",

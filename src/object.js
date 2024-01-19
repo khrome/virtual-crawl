@@ -45,6 +45,7 @@ import { Door } from './objects/scenery/door.js';
 import { Wall } from './objects/scenery/wall.js';
 import { Player } from './objects/monster/player.js';
 import { Orb } from './objects/projectiles/orb.js';
+import Sutra from '@yantra-core/sutra';
 
 
 export { 
@@ -62,8 +63,11 @@ export const projectiles = [ Orb ];
 
 const allObjects = monsters.concat(scenery);
 
-export const preloadAllObjects = async ()=>{
+export const behaviors = new Sutra();
+
+export const preloadAllObjects = async (fn)=>{
     await Promise.all(allObjects.map((ob)=>{
+        if(fn) fn(ob);
         return ob.preload?ob.preload():new Promise((resolve)=> resolve());
     }));
 }

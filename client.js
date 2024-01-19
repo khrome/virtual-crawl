@@ -29,7 +29,8 @@ import { SimpleSubmesh } from './src/submesh.js';
 import { create as createLights } from './src/lights.js';
 import { create as createCamera } from './src/camera.js';
 import { create as createRenderer } from './src/renderer.js';
-import { preloadAllObjects } from './src/object.js';
+import { preloadAllObjects, monsters } from './src/object.js';
+import Sutra from '@yantra-core/sutra';
 
 const params = new URLSearchParams(window.location.search);
 const debug = params.has('debug');
@@ -41,7 +42,12 @@ const container = document.querySelector(".game-world");
 (async ()=>{
     //let's load!
     console.log('start');
-    await preloadAllObjects();
+    await preloadAllObjects((mons)=>{
+        if(mons.personality){
+            const persona = new Sutra();
+            mons.persona = mons.personality(persona);
+        }
+    });
     console.log('stop');
     
     const clock = new Clock();
@@ -183,6 +189,10 @@ const container = document.querySelector(".game-world");
             window.tools.activateMeshPointSelection(document.body, renderer, scene, camera, treadmill);
         }
         
+        //GAME LOOP
+        let markers = [];
+        let markerLCV = null;
+        let ran = null;
         renderer.setAnimationLoop(() => {
             if(window.tools) window.tools.tickStart();
             const delta = clock.getDelta();
@@ -190,6 +200,15 @@ const container = document.querySelector(".game-world");
             if(directional.tick) directional.tick();
             controls.update();
             renderer.render(scene, camera);
+            markers = treadmill.activeMarkers(monsters);
+            for(markerLCV=0; markerLCV< markers.length; markerLCV++){
+                if(markers[markerLCV].object.persona && !ran){
+                    console.log('!!')
+                    markers[markerLCV].object.persona.tick(markers[markerLCV])
+                    ran = false;
+                }
+            }
+            if(ran === false) ran = true; //*/
             if(window.tools) window.tools.tickStop();
         }, 100);
         
