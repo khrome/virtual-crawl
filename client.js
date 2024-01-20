@@ -24,7 +24,7 @@ import {
 } from "three";
 import * as CANNON from 'cannon-es';
 import { DevelopmentTools } from './node_modules/submesh-treadmill/src/development.js';
-import { Player } from './src/object.js';
+import { Player, Enemy } from './src/object.js';
 import { SimpleSubmesh } from './src/submesh.js';
 import { create as createLights } from './src/lights.js';
 import { create as createCamera } from './src/camera.js';
@@ -98,6 +98,7 @@ const container = document.querySelector(".game-world");
             const geometry = new PlaneGeometry( size, size, size, size );
             geometry.translate( 8, 8, 0 ); //reorient to origin @ ll corner
             const submesh = new SimpleSubmesh(geometry, new Vector2(x, y), {
+                treadmill,
                 async: true,
                 onMarkerExit : (marker, submesh, action)=>{
                     const newSubmesh = treadmill.submeshAt(marker.mesh.position.x, marker.mesh.position.y);
@@ -120,7 +121,12 @@ const container = document.querySelector(".game-world");
     }, scene, physicalWorld);
     
     let running = false;
-    const cameraMarker = new Marker(new Player({ color: 'red' }));
+    const cameraMarker = new Marker(new Enemy({ 
+        treadmill, 
+        color: 'red' 
+    }));
+    console.log('meta', meta);
+    
     let lastPoint = null;
     setInterval(()=>{
         let minimap = null;
@@ -173,6 +179,17 @@ const container = document.querySelector(".game-world");
                 cameraX -= 1;
                 break;
         }
+        //*
+        treadmill.addMarkerToStage(new Marker(new Enemy({ 
+            treadmill, 
+            color: 'green' 
+        })), cameraX-2, cameraY);
+        treadmill.addMarkerToStage(new Marker(new Enemy({ 
+            treadmill, 
+            color: 'green' 
+        })), cameraX+2, cameraY);
+        //*/
+        
         treadmill.addMarkerToStage(cameraMarker, cameraX, cameraY);
         controls.target = cameraMarker.mesh.position;
         cameraMarker.linked.push(camera);
@@ -202,10 +219,14 @@ const container = document.querySelector(".game-world");
             renderer.render(scene, camera);
             markers = treadmill.activeMarkers(monsters);
             for(markerLCV=0; markerLCV< markers.length; markerLCV++){
-                if(markers[markerLCV].object.persona && !ran){
-                    console.log('!!')
-                    markers[markerLCV].object.persona.tick(markers[markerLCV])
-                    ran = false;
+                try{
+                    if(markers[markerLCV].object.persona && !ran){
+                        //console.log('!!', markers[markerLCV])
+                        markers[markerLCV].object.persona.tick(markers[markerLCV])
+                        ran = false;
+                    }
+                }catch(ex){
+                    console.log('SUTRA ERROR', ex);
                 }
             }
             if(ran === false) ran = true; //*/
@@ -251,7 +272,7 @@ const container = document.querySelector(".game-world");
                 }
                 return true;
             },
-            markerTypes: [Player]
+            markerTypes: [Enemy]
         });
         
         window.addEventListener('keydown', window.handleKey);

@@ -20,12 +20,12 @@ import{ GameObject } from '../FBXObject.js';
 import{ Orb } from '../projectiles/orb.js'; 
 let staticObject = null;
 
-export class Player extends GameObject{
+export class Avatar extends GameObject{
     constructor(options={}){
         super(options);
         this.size = this.options.size || 0.2;
         this.color = options.color || Math.random() * 0xffffff ;
-        this.persona = Player.persona;
+        this.persona = Avatar.persona;
         if(options.treadmill){
             this.treadmill = options.treadmill;
         }

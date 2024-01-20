@@ -41,6 +41,9 @@ export class SimpleSubmesh extends Submesh{
             resolve: loadResolve
         };
         this.loadTile(tilePosition.x, tilePosition.y);
+        if(options.treadmill){
+            this.treadmill = options.treadmill;
+        }
     }
     
     async loadTile(x, y){
@@ -74,11 +77,13 @@ export class SimpleSubmesh extends Submesh{
         let marker = null;
         let markers = [];
         const options = {
+            treadmill: this.treadmill,
             color: color,
             size: 0.5
         };
         const textMatrix = this.tile.split('\n').map((row)=> row.split('')).reverse();
         const markerOptions = {
+            treadmill: this.treadmill,
             shadow: 'light'
         };
         const passabilityMatrix = [];

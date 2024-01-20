@@ -44,24 +44,27 @@ import { Stairs } from './objects/scenery/stairs.js';
 import { Door } from './objects/scenery/door.js';
 import { Wall } from './objects/scenery/wall.js';
 import { Player } from './objects/monster/player.js';
+import { Enemy } from './objects/monster/enemy.js';
+import { Avatar } from './objects/monster/avatar.js';
 import { Orb } from './objects/projectiles/orb.js';
 import Sutra from '@yantra-core/sutra';
 
 
 export { 
     //MONS
-    Zombie, Player,
+    Zombie, Player, Enemy, Avatar,
     //SCEN
     StoneBlock, Floor, Wall, Door, Stairs,
     // PROJ
     Orb
 };
 
-export const monsters = [ Zombie, Player ];
+export const monsters = [ Zombie, Enemy ];
+export const allies = [ Player, Avatar ];
 export const scenery = [ StoneBlock, Floor, Wall, Door, Stairs ];
 export const projectiles = [ Orb ];
 
-const allObjects = monsters.concat(scenery);
+const allObjects = monsters.concat(allies).concat(scenery);
 
 export const behaviors = new Sutra();
 

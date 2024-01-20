@@ -30,7 +30,7 @@ import {
     PerspectiveCamera
 } from "three";
 import { FBXLoader } from 'three/examples/jsm/loaders/FBXLoader';
-
+import { fear } from './behaviors/monster.js'
 
 export class FBXProjectile extends Projectile{
     
@@ -184,30 +184,19 @@ export class FBXObject extends MeshObject{
     }
 }
 
+
+
 export class GameObject extends MeshObject{
 
     constructor(options={}){
         super(options);
+        if(options.treadmill){
+            this.treadmill = options.treadmill;
+        }
     }
     
     static personality(sutra, actions){
-        // hack: 
-        sutra.on('fightOrFlight', (entity) => {
-            console.log('FOF')
-        });
-        //end hack
-        sutra.addCondition('isThreatened', (context) =>{
-            console.log('isThreat')
-            const monsters = context.nearbyMarkers('monster');
-            //const avgPower = monsters.reduce(()=> );
-            return true;
-        });
-        //sutra.addCondition('isWindy', (context) => context.isWindy);
-        //sutra.addCondition('isRaining', (context) => context.isRaining);
-        
-        sutra.
-            if('isThreatened').
-                then('fightOrFlight')
+        fear(sutra, actions);
         return sutra;
     }
 }
@@ -216,26 +205,14 @@ export class GameFBXObject extends FBXObject{
 
     constructor(options={}){
         super(options);
+        if(options.treadmill){
+            this.treadmill = options.treadmill;
+        }
     }
     
     static personality(sutra, actions){
         // hack: 
-        sutra.on('fightOrFlight', (entity) => {
-            console.log('FOF')
-        });
-        //end hack
-        sutra.addCondition('isThreatened', (context) =>{
-            console.log('isThreat')
-            const monsters = context.nearbyMarkers('monster');
-            //const avgPower = monsters.reduce(()=> );
-            return false;
-        });
-        //sutra.addCondition('isWindy', (context) => context.isWindy);
-        //sutra.addCondition('isRaining', (context) => context.isRaining);
-        
-        sutra.
-            if('isThreatened').
-                then('fightOrFlight')
+        fear(sutra, actions);
         return sutra;
     }
 }
