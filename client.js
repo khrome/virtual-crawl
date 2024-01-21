@@ -30,7 +30,8 @@ import { create as createLights } from './src/lights.js';
 import { create as createCamera } from './src/camera.js';
 import { create as createRenderer } from './src/renderer.js';
 import { preloadAllObjects, monsters } from './src/object.js';
-import Sutra from '@yantra-core/sutra';
+//import Sutra from '@yantra-core/sutra';
+import { Scripting } from './src/objects/behaviors/by.objects.js';
 
 const params = new URLSearchParams(window.location.search);
 const debug = params.has('debug');
@@ -44,7 +45,7 @@ const container = document.querySelector(".game-world");
     console.log('start');
     await preloadAllObjects((mons)=>{
         if(mons.personality){
-            const persona = new Sutra();
+            const persona = new Scripting();
             mons.persona = mons.personality(persona);
         }
     });
@@ -222,13 +223,15 @@ const container = document.querySelector(".game-world");
                 try{
                     if(markers[markerLCV].object.persona && !ran){
                         //console.log('!!', markers[markerLCV])
-                        markers[markerLCV].object.persona.tick(markers[markerLCV])
+                        const lcv = markerLCV;
+                        markers[lcv].object.persona.tick(markers[lcv], {});
                         ran = false;
                     }
                 }catch(ex){
                     console.log('SUTRA ERROR', ex);
                 }
             }
+            
             if(ran === false) ran = true; //*/
             if(window.tools) window.tools.tickStop();
         }, 100);
