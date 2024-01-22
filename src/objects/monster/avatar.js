@@ -54,6 +54,13 @@ export class Avatar extends GameObject{
                 marker.action('forward', treadmill.worldPointFor(target), options, treadmill);
                 return delta; 
             },
+            pathTo: (delta, marker, target, options={}, treadmill) =>{
+                const path = treadmill.pathfind(
+                    treadmill.worldPointFor(marker.mesh.position),
+                    treadmill.worldPointFor(target)
+                )
+                marker.action('moveTo', treadmill.worldPointFor(target), options, treadmill);
+            },
             turn: (delta, marker, target, options={}, treadmill) => {
                 return marker.turnRight(delta, target, options, treadmill);
             },

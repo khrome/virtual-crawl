@@ -8,6 +8,7 @@ import {
 } from 'submesh-treadmill';
 import {
     CylinderGeometry,
+    Vector3,
     Matrix4,
     MeshPhongMaterial,
     Mesh,
@@ -49,11 +50,32 @@ export class Enemy extends GameObject{
         return {
             priority: ['moveTo', 'interact', 'toss'],
             moveTo: (delta, marker, target, options={}, treadmill) => { //meta
+                //const direction = dir.subVectors( point, this.mesh.position ).normalize();
+                //var raycaster = new Raycaster( this.mesh.position, direction );
                 //todo: test "crow flies" obstruction, if obstructed: path find
                 marker.action('turn', treadmill.worldPointFor(target), options, treadmill);
                 marker.action('forward', treadmill.worldPointFor(target), options, treadmill);
                 return delta; 
             },
+            pathTo: (delta, marker, target, options={}, treadmill) => { //meta
+                //const direction = dir.subVectors( point, this.mesh.position ).normalize();
+                //var raycaster = new Raycaster( this.mesh.position, direction );
+                
+                /*const path = treadmill.pathfind(
+                    treadmill.worldPointFor(marker.mesh.position),
+                    treadmill.worldPointFor(target)
+                );
+                let point = null;
+                path.forEach((waypoint)=>{
+                    point = new Vector3( waypoint.x, waypoint.y, 0 );
+                    marker.action('turn', treadmill.worldPointFor(point), options, treadmill);
+                    marker.action('forward', treadmill.worldPointFor(point), options, treadmill);
+                }); //*/
+                //console.log('PATH', path);
+                marker.action('moveTo', target, options, treadmill);
+                return delta; 
+            },
+            //MoMa
             turn: (delta, marker, target, options={}, treadmill) => {
                 return marker.turnRight(delta, target, options, treadmill);
             },

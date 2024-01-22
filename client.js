@@ -30,7 +30,6 @@ import { create as createLights } from './src/lights.js';
 import { create as createCamera } from './src/camera.js';
 import { create as createRenderer } from './src/renderer.js';
 import { preloadAllObjects, monsters } from './src/object.js';
-//import Sutra from '@yantra-core/sutra';
 import { Scripting } from './src/objects/behaviors/by.objects.js';
 
 const params = new URLSearchParams(window.location.search);
@@ -39,6 +38,89 @@ const debug = params.has('debug');
 let treadmill;
 
 const container = document.querySelector(".game-world");
+
+const renderMap = (matrix)=>{
+    return matrix.map(
+        (line)=> line.map((char)=>char?' ':'#').join('')
+    ).reverse().join('\n')
+};
+
+const addPositionsToListFor = (ix, iy, pos, map, list, localX, localY)=>{
+    const x = ix + 16;
+    const y = iy + 16;
+    if(x >=48 || x < 0) return false;
+    if(y >=48 || y < 0) return false;
+    if(typeof map[y][x] !== 'boolean') return false;
+    if(!map[y][x]) return false;
+    map[y][x] = pos;
+    //*
+    if(ix === localX && iy === localY){
+        list.length = 0; 
+        return true;
+    } //*/
+    list.push({
+        x: ix-1,
+        y: iy,
+        pos: pos+1
+    });
+    list.push({
+        x: ix+1,
+        y: iy,
+        pos: pos+1
+    });
+    list.push({
+        x: ix,
+        y: iy-1,
+        pos: pos+1
+    });
+    list.push({
+        x: ix,
+        y: iy+1,
+        pos: pos+1
+    });
+    return false;
+};
+
+const tracePathToZero = (ix, iy, map, reversePath)=>{
+    let x = ix + 16;
+    let y = iy + 16;
+    let minValue = null;
+    let lastValue = null;
+    let can = null;
+    while(minValue === null || minValue > 0){
+        for(let dy = -1; dy <= 1; dy++){
+            for(let dx = -1; dx <= 1; dx++){
+                if(typeof map[y+dy][x+dx] === 'number' && (
+                    minValue === null || 
+                    map[y+dy][x+dx] < minValue
+                )){
+                    minValue = map[y+dy][x+dx];
+                    can = {
+                        //treadmill coords
+                        x: x+dx-16,
+                        y: y+dy-16,
+                        z: 0
+                    }
+                    map[y+dy][x+dx] = 'X'
+                }
+            }
+        }
+        if(lastValue && minValue && lastValue < minValue){
+            console.log(`path increased from ${lastValue} to ${minVlaue}`)
+            throw new Error('path increased!');
+        }
+        if(minValue === null){
+            console.log('found nothing')
+            throw new Error('found nothing');
+        }
+        reversePath.push(can);
+        x = can.x+16;
+        y = can.y+16;
+        if(minValue === lastValue) throw new Error('no change')
+        lastValue = minValue;
+    }
+    return reversePath.reverse();
+};
 
 (async ()=>{
     //let's load!
@@ -117,9 +199,62 @@ const container = document.querySelector(".game-world");
             submesh.markers = submesh.createMarkers();
             return submesh;
         },
+        pathfind: (origin, target)=>{
+            console.log('PATHFIND', origin, target)
+            const map = treadmill.passabilityMap();
+            const localOrigin = treadmill.treadmillPointFor(origin);
+            const localTarget = treadmill.treadmillPointFor(target);
+            const localX = Math.floor(localTarget.x);
+            const localY = Math.floor(localTarget.y);
+            const list = [
+                {
+                    x:  Math.floor(localOrigin.x),
+                    y:  Math.floor(localOrigin.y),
+                    pos: 0
+                }
+            ];
+            let current = null;
+            while(list.length){
+                const current = list.shift();
+                const hadSideEffect = addPositionsToListFor(
+                    current.x, current.y, current.pos, 
+                    map, list, localX, localY
+                );
+                
+            }
+            const reversePath = [];
+            reversePath.push({
+                x: localTarget.x,
+                y: localTarget.y
+            })
+            
+            const path = tracePathToZero(localX, localY, map, reversePath);
+            return path;
+        },
         x: meta.target.tile.x, 
         y: meta.target.tile.y
     }, scene, physicalWorld);
+    treadmill.passabilityMap = ()=>{
+        const matrix = [];
+        try{
+            let submesh = null
+            for(let y = -1; y <= 1; y++){
+                for(let x = -1; x <= 1; x++){
+                    const cell = treadmill.submeshCellAt(x*16, y*16);
+                    submesh = treadmill[cell];
+                    for(let offy = 0; offy < 16; offy++){
+                        for(let offx = 0; offx < 16; offx++){
+                            if(!matrix[(y+1)*16 + offy]) matrix[(y+1)*16 + offy] = [];
+                            matrix[(y+1)*16 + offy][(x+1)*16 + offx] = submesh.passability[offy][offx];
+                        }
+                    }
+                }
+            }
+        }catch(ex){
+            console.log('PATH ERROR', ex);
+        }
+        return matrix;
+    }
     
     let running = false;
     const cameraMarker = new Marker(new Enemy({ 
@@ -220,19 +355,12 @@ const container = document.querySelector(".game-world");
             renderer.render(scene, camera);
             markers = treadmill.activeMarkers(monsters);
             for(markerLCV=0; markerLCV< markers.length; markerLCV++){
-                try{
-                    if(markers[markerLCV].object.persona && !ran){
-                        //console.log('!!', markers[markerLCV])
-                        const lcv = markerLCV;
-                        markers[lcv].object.persona.tick(markers[lcv], {});
-                        ran = false;
-                    }
-                }catch(ex){
-                    console.log('SUTRA ERROR', ex);
+                if(markers[markerLCV].object.persona){
+                    markers[markerLCV].object.persona.tick(
+                        markers[markerLCV], {}
+                    );
                 }
             }
-            
-            if(ran === false) ran = true; //*/
             if(window.tools) window.tools.tickStop();
         }, 100);
         
